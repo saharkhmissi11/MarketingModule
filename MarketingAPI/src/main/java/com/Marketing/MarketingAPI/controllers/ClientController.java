@@ -1,7 +1,9 @@
 package com.Marketing.MarketingAPI.controllers;
 import com.Marketing.MarketingAPI.DTO.ClientDTO;
+import com.Marketing.MarketingAPI.DTO.ProductDto;
 import com.Marketing.MarketingAPI.models.Gender;
 import com.Marketing.MarketingAPI.services.ClientService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +44,17 @@ public class ClientController {
     public ResponseEntity<ClientDTO> addClient(@RequestBody ClientDTO clientDTO){
         ClientDTO savedClient = clientService.addClient(clientDTO);
         return new ResponseEntity<>(savedClient,HttpStatus.CREATED);
+    }
+    @PutMapping("/update")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ClientDTO> UpdateProduct(@RequestBody ClientDTO clientDTO , HttpServletResponse response) {
+        ClientDTO updateClient= clientService.UpdateClient(clientDTO);
+        return new ResponseEntity<>(updateClient, HttpStatus.OK);
+    }
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) {
+        clientService.DeleteClientById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

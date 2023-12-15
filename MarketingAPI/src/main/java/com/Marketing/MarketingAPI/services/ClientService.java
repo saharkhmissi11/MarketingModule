@@ -71,6 +71,9 @@ public class ClientService {
     }
     public ClientDTO UpdateClient(ClientDTO clientDTO){
         Client client= modelMapper.map(clientDTO,Client.class);
+        FieldOfActivity field = fieldOfActivityRepo.findById(clientDTO.getField_id())
+                .orElseThrow(() -> new EntityNotFoundException("Field not found with id: " + clientDTO.getField_id()));
+        client.setField(field);
         Client updatedClient = clientRepo.save(client);
         return convertToDto(updatedClient);
     }

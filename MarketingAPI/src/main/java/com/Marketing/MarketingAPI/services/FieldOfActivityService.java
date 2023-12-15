@@ -1,6 +1,8 @@
 package com.Marketing.MarketingAPI.services;
 
+import com.Marketing.MarketingAPI.DTO.ClientDTO;
 import com.Marketing.MarketingAPI.DTO.FieldOfActivityDTO;
+import com.Marketing.MarketingAPI.models.Client;
 import com.Marketing.MarketingAPI.models.FieldOfActivity;
 import com.Marketing.MarketingAPI.repositories.FieldOfActivityRepo;
 import jakarta.transaction.Transactional;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,13 +23,21 @@ import java.util.Optional;
 public class FieldOfActivityService {
     private  final FieldOfActivityRepo fieldOfActivityRepo;
     private final ModelMapper modelMapper ;
-    public List<FieldOfActivity> getAllFieldsOfActivity() {
-        return fieldOfActivityRepo.findAll();
+    public List<FieldOfActivityDTO> getAllFields() {
+        List<FieldOfActivity> fieldOfActivities = fieldOfActivityRepo.findAll();
+        return fieldOfActivities.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
     public Optional<FieldOfActivityDTO> findCategoryById(Long id){
         if (id==0){log.error("Field is null");}
         Optional<FieldOfActivity> fieldOfActivity=fieldOfActivityRepo.findById(id);
         return fieldOfActivity.map(u->modelMapper.map(u, FieldOfActivityDTO.class));
+    }
+    public String findFieldNameById(Long id){
+        if (id==0){log.error("Field is null");}
+        FieldOfActivity fieldOfActivity=fieldOfActivityRepo.findById(id).get();
+        return fieldOfActivity.getField();
     }
     public FieldOfActivityDTO addField (FieldOfActivityDTO fieldDto){
         FieldOfActivity field= modelMapper.map(fieldDto,FieldOfActivity.class);
@@ -40,5 +51,9 @@ public class FieldOfActivityService {
     }
     public void deleteFieldOfActivity(Long id) {
         fieldOfActivityRepo.deleteById(id);
+    }
+    private FieldOfActivityDTO convertToDto(FieldOfActivity field) {
+        FieldOfActivityDTO fieldOfActivityDTO = modelMapper.map(field, FieldOfActivityDTO.class);
+        return fieldOfActivityDTO;
     }
 }
